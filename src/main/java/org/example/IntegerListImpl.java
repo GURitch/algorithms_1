@@ -2,23 +2,23 @@ package org.example;
 
 import java.util.NoSuchElementException;
 
-public class StringListImpl implements StringList {
+public class IntegerListImpl implements IntegerList {
     private static final int DEFAULT_CAPACITY = 10;
-    private String[] elements;
+    private Integer[] elements;
     private int size;
 
-    public StringListImpl() {
-        this.elements = new String[DEFAULT_CAPACITY];
+    public IntegerListImpl() {
+        this.elements = new Integer[DEFAULT_CAPACITY];
         this.size = 0;
     }
 
-    public StringListImpl(int capacity) {
-        this.elements = new String[capacity];
+    public IntegerListImpl(int capacity) {
+        this.elements = new Integer[capacity];
         this.size = 0;
     }
 
     @Override
-    public String add(String item) {
+    public Integer add(Integer item) {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null");
         }
@@ -31,7 +31,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String add(int index, String item) {
+    public Integer add(int index, Integer item) {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null");
         }
@@ -51,20 +51,20 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String set(int index, String item) {
+    public Integer set(int index, Integer item) {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null");
         }
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Invalid index");
         }
-        String previousItem = elements[index];
+        Integer previousItem = elements[index];
         elements[index] = item;
         return previousItem;
     }
 
     @Override
-    public String remove(String item) {
+    public Integer remove(Integer item) {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null");
         }
@@ -83,11 +83,11 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String remove(int index) {
+    public Integer remove(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Invalid index");
         }
-        String removedItem = elements[index];
+        Integer removedItem = elements[index];
         // Сдвигаем элементы влево
         for (int i = index; i < size - 1; i++) {
             elements[i] = elements[i + 1];
@@ -98,20 +98,17 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public boolean contains(String item) {
+    public boolean contains(Integer item) {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null");
         }
-        for (int i = 0; i < size; i++) {
-            if (elements[i].equals(item)) {
-                return true;
-            }
-        }
-        return false;
+        Integer[] arrCopy = toArray();
+        sortInsertion(arrCopy);
+        return binarySort(arrCopy,item);
     }
 
     @Override
-    public int indexOf(String item) {
+    public int indexOf(Integer item) {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null");
         }
@@ -124,7 +121,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public int lastIndexOf(String item) {
+    public int lastIndexOf(Integer item) {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null");
         }
@@ -137,7 +134,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String get(int index) {
+    public Integer get(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Invalid index");
         }
@@ -145,7 +142,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public boolean equals(StringList otherList) {
+    public boolean equals(IntegerList otherList) {
         if (otherList == null) {
             throw new IllegalArgumentException("Other list cannot be null");
         }
@@ -179,16 +176,48 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String[] toArray() {
-        String[] array = new String[size];
+    public Integer[] toArray() {
+        Integer[] array = new Integer[size];
         System.arraycopy(elements, 0, array, 0, size);
         return array;
     }
 
     private void resizeArray() {
         int newCapacity = elements.length * 2;
-        String[] newElements = new String[newCapacity];
+        Integer[] newElements = new Integer[newCapacity];
         System.arraycopy(elements, 0, newElements, 0, size);
         elements = newElements;
+    }
+
+    private void sortInsertion(Integer[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            int temp = arr[i];
+            int j = i;
+            while (j > 0 && arr[j - 1] >= temp) {
+                arr[j] = arr[j - 1];
+                j--;
+            }
+            arr[j] = temp;
+        }
+    }
+
+    private boolean binarySort(Integer[] arr, int element) {
+        int min = 0;
+        int max = arr.length - 1;
+
+        while (min <= max) {
+            int mid = (min + max) / 2;
+
+            if (element == arr[mid]) {
+                return true;
+            }
+
+            if (element < arr[mid]) {
+                max = mid - 1;
+            } else {
+                min = mid + 1;
+            }
+        }
+        return false;
     }
 }
